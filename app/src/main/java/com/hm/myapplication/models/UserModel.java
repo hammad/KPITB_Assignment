@@ -20,6 +20,7 @@ public class UserModel {
     public String surname = "";
     public String gender = "";
     public String region = "";
+    public String photoUrl = "";
 
     public UserModel() {
 
@@ -48,6 +49,11 @@ public class UserModel {
             if (object.has("region") && !object.isNull("region")) {
 
                 this.region = object.getString("region");
+            }
+
+            if (object.has("photo") && !object.isNull("photo")) {
+
+                this.photoUrl = object.getString("photo");
             }
 
         } catch (JSONException e) {
