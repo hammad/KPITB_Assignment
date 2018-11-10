@@ -10,6 +10,6 @@ public interface ApiService {
     @GET("api/?ext")
     Call<ResponseBody> getSingleUser();
 
-    @GET("api/")
+    @GET("api/?ext")
     Call<ResponseBody> getUsersList(@Query("amount") int amount);
 }

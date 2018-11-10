@@ -1,7 +1,10 @@
 package com.hm.myapplication;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView usernameTV, surnameTV, genderTV, regionTV;
     private ImageView userIV;
 
+    private Button usersListButton;
+
+    private ProgressLoader mLoadingIndicator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +45,15 @@ public class MainActivity extends AppCompatActivity {
         genderTV = (TextView) findViewById(R.id.gender_text_view);
         regionTV = (TextView) findViewById(R.id.region_text_view);
         userIV = (ImageView) findViewById(R.id.user_image_view);
+
+        usersListButton = (Button) findViewById(R.id.show_users_button);
+        usersListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                getUsersList(20);
+            }
+        });
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://uinames.com/")
@@ -68,10 +84,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void getSingleUser() {
 
+        displayLoadingIndicator("Loading...");
+
         Call<ResponseBody> call = apiService.getSingleUser();
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                hideLoadingIndicator();
 
                 JSONObject responseJson = getJsonResponse(response);
 
@@ -85,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
+                hideLoadingIndicator();
+
                 System.out.println(t.getMessage());
             }
         });
@@ -92,10 +114,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void getUsersList(int amount) {
 
+        displayLoadingIndicator("Loading...");
+
         Call<ResponseBody> call = apiService.getUsersList(amount);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                hideLoadingIndicator();
 
                 JSONArray responseObject = getJsonArrayResponse(response);
 
@@ -118,15 +144,27 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                System.out.println(users);
+                goToUsersListScreen(users);
+
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
+                hideLoadingIndicator();
+
                 System.out.println(t.getMessage());
             }
         });
+    }
+
+    private void goToUsersListScreen(ArrayList users) {
+
+        Intent intent = new Intent(MainActivity.this, UsersListActivity.class);
+        intent.putExtra("users", users);
+
+        startActivity(intent);
+
     }
 
     private JSONObject getJsonResponse(Response<ResponseBody> response) {
@@ -168,4 +206,17 @@ public class MainActivity extends AppCompatActivity {
 
         return responseJson;
     }
+
+    protected void displayLoadingIndicator(String message) {
+
+        mLoadingIndicator = new ProgressLoader(this, message);
+        mLoadingIndicator.show();
+    }
+
+    protected void hideLoadingIndicator() {
+
+        if(mLoadingIndicator != null && mLoadingIndicator.isShowing())
+            mLoadingIndicator.dismiss();
+    }
+
 }

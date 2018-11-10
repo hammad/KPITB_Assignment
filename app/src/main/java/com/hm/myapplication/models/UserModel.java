@@ -14,7 +14,9 @@ package com.hm.myapplication.models;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class UserModel {
+import java.io.Serializable;
+
+public class UserModel implements Serializable {
 
     public String name = "";
     public String surname = "";
